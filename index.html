@@ -421,7 +421,7 @@
     <div class="axis-line" aria-hidden="true"></div>
 
     <!-- WEEK 2 -->
-    <article class="stop" data-era="witness" style="--era:var(--era-witness)">
+    <article class="stop" data-week="2" data-era="witness" style="--era:var(--era-witness)">
       <div class="node"><span class="axseg" aria-hidden="true"></span><span class="year">1810s</span><span class="dot" aria-hidden="true"></span></div>
       <div class="card">
         <div class="cap"><span class="wklab">Wk 2</span><span class="chip">Foundations</span></div>
@@ -444,7 +444,7 @@
     </article>
 
     <!-- WEEK 4 -->
-    <article class="stop" data-era="gospel" style="--era:var(--era-gospel)">
+    <article class="stop" data-week="4" data-era="gospel" style="--era:var(--era-gospel)">
       <div class="node"><span class="axseg" aria-hidden="true"></span><span class="year">1890s-1920s</span><span class="dot" aria-hidden="true"></span></div>
       <div class="card">
         <div class="cap"><span class="wklab">Wk 4</span><span class="chip">Excellence under exclusion</span></div>
@@ -468,7 +468,7 @@
     </article>
 
     <!-- WEEK 5 -->
-    <article class="stop" data-era="soul" style="--era:var(--era-soul)">
+    <article class="stop" data-week="5" data-era="soul" style="--era:var(--era-soul)">
       <div class="node"><span class="axseg" aria-hidden="true"></span><span class="year">1947</span><span class="dot" aria-hidden="true"></span></div>
       <div class="card">
         <div class="cap"><span class="wklab">Wk 5</span><span class="chip">Integration</span></div>
@@ -491,7 +491,7 @@
     </article>
 
     <!-- WEEK 6 -->
-    <article class="stop" data-era="reggae" style="--era:var(--era-reggae)">
+    <article class="stop" data-week="6" data-era="reggae" style="--era:var(--era-reggae)">
       <div class="node"><span class="axseg" aria-hidden="true"></span><span class="year">1967</span><span class="dot" aria-hidden="true"></span></div>
       <div class="card">
         <div class="cap"><span class="wklab">Wk 6</span><span class="chip">Protest</span></div>
@@ -515,7 +515,7 @@
     </article>
 
     <!-- WEEK 7 -->
-    <article class="stop" data-era="reggae" style="--era:var(--era-reggae)">
+    <article class="stop" data-week="7" data-era="reggae" style="--era:var(--era-reggae)">
       <div class="node"><span class="axseg" aria-hidden="true"></span><span class="year">1968</span><span class="dot" aria-hidden="true"></span></div>
       <div class="card">
         <div class="cap"><span class="wklab">Wk 7</span><span class="chip">Protest</span></div>
@@ -549,6 +549,35 @@
 <script>
 (function(){
   "use strict";
+  var params = new URLSearchParams(window.location.search);
+  var maxWeek = parseInt(params.get('maxWeek') || '7', 10);
+  if (!maxWeek || maxWeek < 2 || maxWeek > 7) maxWeek = 7;
+
+  if (maxWeek < 7) {
+    var title = document.querySelector('title');
+    if (title) title.textContent = title.textContent.replace('Weeks 1-7', 'Weeks 1-' + maxWeek);
+
+    var course = document.querySelector('.course');
+    if (course) course.innerHTML = '<b>BFS142</b> · Black Studies<br>Sport, Race and Power · Weeks 1-' + maxWeek;
+
+    var timelineH = document.querySelector('.timeline-h');
+    if (timelineH) timelineH.textContent = 'The first-half arc · Weeks 2 → ' + maxWeek;
+
+    var foot = document.querySelector('footer.foot span');
+    if (foot) foot.textContent = 'BFS142 · Sport, Race and Power · Weeks 1-' + maxWeek;
+  }
+
+  var spine = document.getElementById('spine');
+  var allStops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
+  var keptStops = allStops.filter(function(s){
+    var wk = parseInt(s.dataset.week || '0', 10);
+    return !wk || wk <= maxWeek;
+  });
+  allStops.forEach(function(s){
+    var wk = parseInt(s.dataset.week || '0', 10);
+    if (wk && wk > maxWeek) s.remove();
+  });
+  if (spine) spine.style.gridTemplateColumns = 'repeat(' + keptStops.length + ',1fr)';
 
   // ---- Detail expand / collapse ----
   var toggles = Array.prototype.slice.call(document.querySelectorAll('.ev-toggle'));
@@ -578,7 +607,7 @@
   });
 
   // ---- Era filter ----
-  var spine = document.getElementById('spine');
+  spine = document.getElementById('spine');
   var eraBtns = Array.prototype.slice.call(document.querySelectorAll('.era-btn'));
   var resetBtn = document.getElementById('btn-reset');
   var stops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
